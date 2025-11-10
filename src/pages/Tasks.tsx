@@ -1,12 +1,18 @@
+import { useState } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Plus, CheckCircle2, Clock, AlertCircle, CalendarIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 
 const taskTypes = [
   "Предпосевная обработка",
@@ -15,6 +21,17 @@ const taskTypes = [
   "Заготовка",
   "Хранение",
   "Корм скота",
+];
+
+const crops = [
+  "Озимая пшеница",
+  "Яровая пшеница",
+  "Кукуруза",
+  "Подсолнечник",
+  "Ячмень",
+  "Рапс",
+  "Соя",
+  "Картофель",
 ];
 
 const tasks = [
@@ -61,6 +78,10 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function Tasks() {
+  const [selectedTaskType, setSelectedTaskType] = useState<string>("");
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -87,7 +108,7 @@ export default function Tasks() {
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="task-type">Тип задания</Label>
-                  <Select>
+                  <Select onValueChange={setSelectedTaskType}>
                     <SelectTrigger id="task-type">
                       <SelectValue placeholder="Выберите тип задания" />
                     </SelectTrigger>
@@ -100,6 +121,88 @@ export default function Tasks() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {selectedTaskType === "Предпосевная обработка" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="crop">Культура к посеву</Label>
+                      <Select>
+                        <SelectTrigger id="crop">
+                          <SelectValue placeholder="Выберите культуру" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {crops.map((crop) => (
+                            <SelectItem key={crop} value={crop}>
+                              {crop}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Период выполнения</Label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="start-date" className="text-sm text-muted-foreground">Начало</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id="start-date"
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !startDate && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {startDate ? format(startDate, "PPP", { locale: ru }) : <span>Выберите дату</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={startDate}
+                                onSelect={setStartDate}
+                                initialFocus
+                                className="pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="end-date" className="text-sm text-muted-foreground">Окончание</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                id="end-date"
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !endDate && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {endDate ? format(endDate, "PPP", { locale: ru }) : <span>Выберите дату</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={endDate}
+                                onSelect={setEndDate}
+                                initialFocus
+                                className="pointer-events-auto"
+                                disabled={(date) => startDate ? date < startDate : false}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
                 
                 <div className="space-y-2">
                   <Label htmlFor="assignee">Исполнитель</Label>
