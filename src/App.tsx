@@ -9,6 +9,7 @@ import Staff from "./pages/Staff";
 import Equipment from "./pages/Equipment";
 import Livestock from "./pages/Livestock";
 import Integrations from "./pages/Integrations";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/equipment" element={<Equipment />} />
           <Route path="/livestock" element={<Livestock />} />
           <Route path="/integrations" element={<Integrations />} />
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

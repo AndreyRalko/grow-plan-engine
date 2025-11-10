@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { useLocation } from "react-router-dom";
+import { NavLink } from "@/components/NavLink";
 import { 
   LayoutDashboard, 
   Users, 
@@ -7,8 +7,23 @@ import {
   Beef, 
   Cable, 
   ClipboardList,
-  Sprout
+  Sprout,
+  Settings
 } from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarHeader,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
 const navigation = [
   { name: "Дашборд", href: "/", icon: LayoutDashboard },
@@ -17,50 +32,76 @@ const navigation = [
   { name: "Техника", href: "/equipment", icon: Tractor },
   { name: "Животные", href: "/livestock", icon: Beef },
   { name: "Интеграции", href: "/integrations", icon: Cable },
+  { name: "Настройки", href: "/settings", icon: Settings },
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+function AppSidebar() {
+  const { state } = useSidebar();
   const location = useLocation();
+  const collapsed = state === "collapsed";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-background">
-      <nav className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="bg-primary rounded-lg p-2">
-                <Sprout className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                АгроСистема
-              </span>
-            </div>
-            <div className="flex space-x-1">
+    <Sidebar collapsible="icon" className={collapsed ? "w-14" : "w-60"}>
+      <SidebarHeader className="border-b border-border">
+        <div className="flex items-center space-x-2 p-2">
+          <div className="bg-primary rounded-lg p-2">
+            <Sprout className="h-6 w-6 text-primary-foreground" />
+          </div>
+          {!collapsed && (
+            <span className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              АгроСистема
+            </span>
+          )}
+        </div>
+      </SidebarHeader>
+      
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Основное</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={cn(
-                      "flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200",
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-md"
-                        : "text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span className="hidden md:inline text-sm font-medium">{item.name}</span>
-                  </Link>
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <NavLink 
+                        to={item.href} 
+                        end
+                        className="flex items-center space-x-2"
+                        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {!collapsed && <span>{item.name}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+}
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-secondary/30 to-background">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col">
+          <header className="h-14 border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-40 flex items-center px-4">
+            <SidebarTrigger />
+          </header>
+          <main className="flex-1 p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+              {children}
             </div>
-          </div>
+          </main>
         </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {children}
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }
