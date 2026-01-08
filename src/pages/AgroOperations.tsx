@@ -53,11 +53,8 @@ type FieldType = "start_condition" | "execution";
 interface OperationField {
   id: string;
   name: string;
-  unit: string;
   sensorId: string | null;
   type: FieldType;
-  minValue?: number;
-  maxValue?: number;
 }
 
 interface AgroOperation {
@@ -74,11 +71,11 @@ const initialOperations: AgroOperation[] = [
     name: "Посев",
     description: "Посев сельскохозяйственных культур",
     fields: [
-      { id: "1", name: "Температура почвы", unit: "°C", sensorId: "temp_soil", type: "start_condition", minValue: 8, maxValue: 25 },
-      { id: "2", name: "Влажность почвы", unit: "%", sensorId: "humidity_soil", type: "start_condition", minValue: 40, maxValue: 70 },
-      { id: "3", name: "Ширина междурядья", unit: "см", sensorId: null, type: "execution" },
-      { id: "4", name: "Глубина посадки", unit: "см", sensorId: "depth", type: "execution" },
-      { id: "5", name: "Скорость движения", unit: "км/ч", sensorId: "speed", type: "execution" },
+      { id: "1", name: "Температура почвы", sensorId: "temp_soil", type: "start_condition" },
+      { id: "2", name: "Влажность почвы", sensorId: "humidity_soil", type: "start_condition" },
+      { id: "3", name: "Ширина междурядья", sensorId: null, type: "execution" },
+      { id: "4", name: "Глубина посадки", sensorId: "depth", type: "execution" },
+      { id: "5", name: "Скорость движения", sensorId: "speed", type: "execution" },
     ]
   },
   {
@@ -86,11 +83,11 @@ const initialOperations: AgroOperation[] = [
     name: "Опрыскивание",
     description: "Обработка культур средствами защиты",
     fields: [
-      { id: "1", name: "Скорость ветра", unit: "м/с", sensorId: "wind_speed", type: "start_condition", minValue: 0, maxValue: 4 },
-      { id: "2", name: "Температура воздуха", unit: "°C", sensorId: "temp_air", type: "start_condition", minValue: 10, maxValue: 25 },
-      { id: "3", name: "Влажность воздуха", unit: "%", sensorId: "humidity_air", type: "start_condition", minValue: 40, maxValue: 90 },
-      { id: "4", name: "Норма расхода", unit: "л/га", sensorId: null, type: "execution" },
-      { id: "5", name: "Высота штанги", unit: "см", sensorId: null, type: "execution" },
+      { id: "1", name: "Скорость ветра", sensorId: "wind_speed", type: "start_condition" },
+      { id: "2", name: "Температура воздуха", sensorId: "temp_air", type: "start_condition" },
+      { id: "3", name: "Влажность воздуха", sensorId: "humidity_air", type: "start_condition" },
+      { id: "4", name: "Норма расхода", sensorId: null, type: "execution" },
+      { id: "5", name: "Высота штанги", sensorId: null, type: "execution" },
     ]
   },
 ];
@@ -108,7 +105,6 @@ export default function AgroOperations() {
 
   const [newField, setNewField] = useState<Partial<OperationField>>({
     name: "",
-    unit: "",
     sensorId: null,
     type: "start_condition"
   });
@@ -119,11 +115,8 @@ export default function AgroOperations() {
     const field: OperationField = {
       id: Date.now().toString(),
       name: newField.name || "",
-      unit: newField.unit || "",
       sensorId: newField.sensorId || null,
       type: type,
-      minValue: newField.minValue,
-      maxValue: newField.maxValue,
     };
 
     if (editingOperation) {
@@ -138,7 +131,7 @@ export default function AgroOperations() {
       });
     }
 
-    setNewField({ name: "", unit: "", sensorId: null, type: "start_condition" });
+    setNewField({ name: "", sensorId: null, type: "start_condition" });
   };
 
   const handleRemoveField = (fieldId: string) => {
@@ -206,13 +199,7 @@ export default function AgroOperations() {
               ) : (
                 <span className="text-muted-foreground/50">Без датчика</span>
               )}
-              {field.unit && <Badge variant="outline" className="text-xs">{field.unit}</Badge>}
             </div>
-            {field.type === "start_condition" && (field.minValue !== undefined || field.maxValue !== undefined) && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Диапазон: {field.minValue ?? "—"} - {field.maxValue ?? "—"} {field.unit}
-              </p>
-            )}
           </div>
         </div>
         {isEditing && (
@@ -307,23 +294,13 @@ export default function AgroOperations() {
                     <Card className="border-dashed">
                       <CardContent className="pt-4">
                         <div className="grid gap-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Название параметра</Label>
-                              <Input
-                                placeholder="Например: Влажность почвы"
-                                value={newField.name}
-                                onChange={(e) => setNewField({ ...newField, name: e.target.value })}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Единица измерения</Label>
-                              <Input
-                                placeholder="%, °C, м/с..."
-                                value={newField.unit}
-                                onChange={(e) => setNewField({ ...newField, unit: e.target.value })}
-                              />
-                            </div>
+                          <div className="space-y-2">
+                            <Label>Название параметра</Label>
+                            <Input
+                              placeholder="Например: Влажность почвы"
+                              value={newField.name}
+                              onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>Датчик для получения данных</Label>
@@ -349,26 +326,6 @@ export default function AgroOperations() {
                                 })}
                               </SelectContent>
                             </Select>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Мин. значение</Label>
-                              <Input
-                                type="number"
-                                placeholder="0"
-                                value={newField.minValue ?? ""}
-                                onChange={(e) => setNewField({ ...newField, minValue: e.target.value ? Number(e.target.value) : undefined })}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Макс. значение</Label>
-                              <Input
-                                type="number"
-                                placeholder="100"
-                                value={newField.maxValue ?? ""}
-                                onChange={(e) => setNewField({ ...newField, maxValue: e.target.value ? Number(e.target.value) : undefined })}
-                              />
-                            </div>
                           </div>
                           <Button 
                             variant="outline" 
@@ -399,23 +356,13 @@ export default function AgroOperations() {
                     <Card className="border-dashed">
                       <CardContent className="pt-4">
                         <div className="grid gap-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Название параметра</Label>
-                              <Input
-                                placeholder="Например: Глубина посадки"
-                                value={newField.name}
-                                onChange={(e) => setNewField({ ...newField, name: e.target.value })}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Единица измерения</Label>
-                              <Input
-                                placeholder="см, л/га..."
-                                value={newField.unit}
-                                onChange={(e) => setNewField({ ...newField, unit: e.target.value })}
-                              />
-                            </div>
+                          <div className="space-y-2">
+                            <Label>Название параметра</Label>
+                            <Input
+                              placeholder="Например: Глубина посадки"
+                              value={newField.name}
+                              onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                            />
                           </div>
                           <div className="space-y-2">
                             <Label>Датчик для мониторинга</Label>
