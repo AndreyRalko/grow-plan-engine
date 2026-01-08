@@ -8,7 +8,8 @@ import {
   Cable, 
   ClipboardList,
   Sprout,
-  Settings
+  Settings,
+  Cog
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,6 +29,7 @@ import {
 const navigation = [
   { name: "Дашборд", href: "/", icon: LayoutDashboard },
   { name: "Задания", href: "/tasks", icon: ClipboardList },
+  { name: "Агро-операции", href: "/agro-operations", icon: Cog },
   { name: "Персонал", href: "/staff", icon: Users },
   { name: "Техника", href: "/equipment", icon: Tractor },
   { name: "Животные", href: "/livestock", icon: Beef },
