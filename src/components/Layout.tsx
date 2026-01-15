@@ -9,7 +9,8 @@ import {
   ClipboardList,
   Sprout,
   Settings,
-  Cog
+  Cog,
+  Wheat
 } from "lucide-react";
 import {
   Sidebar,
@@ -30,6 +31,7 @@ const navigation = [
   { name: "Дашборд", href: "/", icon: LayoutDashboard },
   { name: "Задания", href: "/tasks", icon: ClipboardList },
   { name: "Агро-операции", href: "/agro-operations", icon: Cog },
+  { name: "Культуры", href: "/crops", icon: Wheat },
   { name: "Персонал", href: "/staff", icon: Users },
   { name: "Техника", href: "/equipment", icon: Tractor },
   { name: "Животные", href: "/livestock", icon: Beef },
