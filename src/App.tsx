@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Tasks from "./pages/Tasks";
 import AgroOperations from "./pages/AgroOperations";
+import Crops from "./pages/Crops";
 import Staff from "./pages/Staff";
 import Equipment from "./pages/Equipment";
 import Livestock from "./pages/Livestock";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/agro-operations" element={<AgroOperations />} />
+          <Route path="/crops" element={<Crops />} />
           <Route path="/staff" element={<Staff />} />
           <Route path="/equipment" element={<Equipment />} />
           <Route path="/livestock" element={<Livestock />} />
