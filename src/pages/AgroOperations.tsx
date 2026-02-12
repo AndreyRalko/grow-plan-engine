@@ -36,17 +36,54 @@ import {
   Eye
 } from "lucide-react";
 
-// Типы датчиков
-const sensors = [
-  { id: "temp_soil", name: "Температура почвы", icon: Thermometer, unit: "°C" },
-  { id: "temp_air", name: "Температура воздуха", icon: Thermometer, unit: "°C" },
-  { id: "humidity_soil", name: "Влажность почвы", icon: Droplets, unit: "%" },
-  { id: "humidity_air", name: "Влажность воздуха", icon: Droplets, unit: "%" },
-  { id: "wind_speed", name: "Скорость ветра", icon: Wind, unit: "м/с" },
-  { id: "pressure", name: "Атм. давление", icon: Gauge, unit: "гПа" },
-  { id: "depth", name: "Датчик глубины", icon: Ruler, unit: "см" },
-  { id: "speed", name: "Датчик скорости", icon: Timer, unit: "км/ч" },
+// Интеграции и их поля (датчики)
+interface IntegrationField {
+  id: string;
+  name: string;
+  icon: typeof Thermometer;
+  unit: string;
+}
+
+interface Integration {
+  id: string;
+  name: string;
+  fields: IntegrationField[];
+}
+
+const integrations: Integration[] = [
+  {
+    id: "weather_sensors",
+    name: "Погодные датчики",
+    fields: [
+      { id: "temp_air", name: "Температура воздуха", icon: Thermometer, unit: "°C" },
+      { id: "humidity_air", name: "Влажность воздуха", icon: Droplets, unit: "%" },
+      { id: "wind_speed", name: "Скорость ветра", icon: Wind, unit: "м/с" },
+      { id: "pressure", name: "Атмосферное давление", icon: Gauge, unit: "мм рт.ст." },
+      { id: "precipitation_prob", name: "Вероятность осадков", icon: Droplets, unit: "%" },
+      { id: "precipitation_amount", name: "Количество осадков", icon: Droplets, unit: "мм/ч" },
+      { id: "sat", name: "Сумма активных температур", icon: Thermometer, unit: "°C" },
+    ]
+  },
+  {
+    id: "soil_sensors",
+    name: "Почвенные датчики",
+    fields: [
+      { id: "temp_soil", name: "Температура почвы", icon: Thermometer, unit: "°C" },
+      { id: "humidity_soil", name: "Влажность почвы", icon: Droplets, unit: "%" },
+    ]
+  },
+  {
+    id: "equipment_sensors",
+    name: "Датчики техники",
+    fields: [
+      { id: "depth", name: "Датчик глубины", icon: Ruler, unit: "см" },
+      { id: "speed", name: "Датчик скорости", icon: Timer, unit: "км/ч" },
+    ]
+  },
 ];
+
+// Плоский список всех датчиков для поиска по id
+const allSensors = integrations.flatMap(i => i.fields);
 
 type FieldType = "start_condition" | "execution";
 
@@ -109,6 +146,8 @@ export default function AgroOperations() {
     type: "start_condition"
   });
 
+  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(null);
+
   const handleAddField = (type: FieldType) => {
     if (!newField.name) return;
     
@@ -132,6 +171,7 @@ export default function AgroOperations() {
     }
 
     setNewField({ name: "", sensorId: null, type: "start_condition" });
+    setSelectedIntegration(null);
   };
 
   const handleRemoveField = (fieldId: string) => {
@@ -178,7 +218,7 @@ export default function AgroOperations() {
   const setCurrentOperation = editingOperation ? setEditingOperation : setNewOperation;
 
   const getSensorInfo = (sensorId: string | null) => {
-    return sensors.find(s => s.id === sensorId);
+    return allSensors.find(s => s.id === sensorId);
   };
 
   const renderFieldCard = (field: OperationField, isEditing: boolean = false) => {
@@ -303,30 +343,53 @@ export default function AgroOperations() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Датчик для получения данных</Label>
+                            <Label>Интеграция</Label>
                             <Select
-                              value={newField.sensorId || "none"}
-                              onValueChange={(value) => setNewField({ ...newField, sensorId: value === "none" ? null : value })}
+                              value={selectedIntegration || "none"}
+                              onValueChange={(value) => {
+                                setSelectedIntegration(value === "none" ? null : value);
+                                setNewField({ ...newField, sensorId: null });
+                              }}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Выберите датчик" />
+                                <SelectValue placeholder="Выберите интеграцию" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="none">Без датчика (ручной ввод)</SelectItem>
-                                {sensors.map(sensor => {
-                                  const Icon = sensor.icon;
-                                  return (
-                                    <SelectItem key={sensor.id} value={sensor.id}>
-                                      <div className="flex items-center gap-2">
-                                        <Icon className="h-4 w-4" />
-                                        {sensor.name} ({sensor.unit})
-                                      </div>
-                                    </SelectItem>
-                                  );
-                                })}
+                                {integrations.map(integration => (
+                                  <SelectItem key={integration.id} value={integration.id}>
+                                    {integration.name}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
+                          {selectedIntegration && (
+                            <div className="space-y-2">
+                              <Label>Поле интеграции</Label>
+                              <Select
+                                value={newField.sensorId || ""}
+                                onValueChange={(value) => setNewField({ ...newField, sensorId: value })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Выберите показатель" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {integrations.find(i => i.id === selectedIntegration)?.fields.map(field => {
+                                    const Icon = field.icon;
+                                    return (
+                                      <SelectItem key={field.id} value={field.id}>
+                                        <div className="flex items-center gap-2">
+                                          <Icon className="h-4 w-4" />
+                                          {field.name} ({field.unit})
+                                        </div>
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
                           <Button 
                             variant="outline" 
                             onClick={() => handleAddField("start_condition")}
@@ -365,30 +428,53 @@ export default function AgroOperations() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Датчик для мониторинга</Label>
+                            <Label>Интеграция</Label>
                             <Select
-                              value={newField.sensorId || "none"}
-                              onValueChange={(value) => setNewField({ ...newField, sensorId: value === "none" ? null : value })}
+                              value={selectedIntegration || "none"}
+                              onValueChange={(value) => {
+                                setSelectedIntegration(value === "none" ? null : value);
+                                setNewField({ ...newField, sensorId: null });
+                              }}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Выберите датчик" />
+                                <SelectValue placeholder="Выберите интеграцию" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="none">Без датчика (ручной ввод)</SelectItem>
-                                {sensors.map(sensor => {
-                                  const Icon = sensor.icon;
-                                  return (
-                                    <SelectItem key={sensor.id} value={sensor.id}>
-                                      <div className="flex items-center gap-2">
-                                        <Icon className="h-4 w-4" />
-                                        {sensor.name} ({sensor.unit})
-                                      </div>
-                                    </SelectItem>
-                                  );
-                                })}
+                                {integrations.map(integration => (
+                                  <SelectItem key={integration.id} value={integration.id}>
+                                    {integration.name}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
+                          {selectedIntegration && (
+                            <div className="space-y-2">
+                              <Label>Поле интеграции</Label>
+                              <Select
+                                value={newField.sensorId || ""}
+                                onValueChange={(value) => setNewField({ ...newField, sensorId: value })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Выберите показатель" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {integrations.find(i => i.id === selectedIntegration)?.fields.map(field => {
+                                    const Icon = field.icon;
+                                    return (
+                                      <SelectItem key={field.id} value={field.id}>
+                                        <div className="flex items-center gap-2">
+                                          <Icon className="h-4 w-4" />
+                                          {field.name} ({field.unit})
+                                        </div>
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
                           <Button 
                             variant="outline" 
                             onClick={() => handleAddField("execution")}
