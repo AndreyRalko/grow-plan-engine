@@ -11,6 +11,7 @@ import Staff from "./pages/Staff";
 import Equipment from "./pages/Equipment";
 import Livestock from "./pages/Livestock";
 import Integrations from "./pages/Integrations";
+import WeatherSensors from "./pages/WeatherSensors";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/equipment" element={<Equipment />} />
           <Route path="/livestock" element={<Livestock />} />
           <Route path="/integrations" element={<Integrations />} />
+          <Route path="/integrations/weather-sensors" element={<WeatherSensors />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
