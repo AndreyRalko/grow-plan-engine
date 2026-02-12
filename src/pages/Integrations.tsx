@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Cloud, Database, Satellite, Thermometer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const integrations = [
   {
@@ -36,6 +37,7 @@ const integrations = [
 ];
 
 export default function Integrations() {
+  const navigate = useNavigate();
   return (
     <Layout>
       <div className="space-y-6">
@@ -62,8 +64,14 @@ export default function Integrations() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" size="sm">
-                  Настроить
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (integration.id === 1) navigate("/integrations/weather-sensors");
+                  }}
+                >
+                  Подробнее
                 </Button>
               </CardContent>
             </Card>
