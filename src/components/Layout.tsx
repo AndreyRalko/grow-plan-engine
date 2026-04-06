@@ -10,7 +10,8 @@ import {
   Sprout,
   Settings,
   Cog,
-  Wheat
+  Wheat,
+  FlaskConical
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,6 +36,7 @@ const navigation = [
   { name: "Персонал", href: "/staff", icon: Users },
   { name: "Техника", href: "/equipment", icon: Tractor },
   { name: "Животные", href: "/livestock", icon: Beef },
+  { name: "Удобрения", href: "/fertilizer", icon: FlaskConical },
   { name: "Интеграции", href: "/integrations", icon: Cable },
   { name: "Настройки", href: "/settings", icon: Settings },
 ];
