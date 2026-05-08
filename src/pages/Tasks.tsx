@@ -285,7 +285,9 @@ export default function Tasks() {
                 )}
 
                 {!isTransport && (
+                <>
                 <div className="space-y-2">
+                  <Label htmlFor="crop">Культура</Label>
                   <Select onValueChange={setSelectedCrop}>
                     <SelectTrigger id="crop">
                       <SelectValue placeholder="Выберите культуру" />
@@ -315,6 +317,7 @@ export default function Tasks() {
                     </SelectContent>
                   </Select>
                 </div>
+                </>
                 )}
 
                 {selectedCrop && optimal && (
