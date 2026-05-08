@@ -164,7 +164,8 @@ export default function AgroOperations() {
     id: "",
     name: "",
     description: "",
-    fields: []
+    fields: [],
+    operationType: "standard"
   });
 
   const [newField, setNewField] = useState<Partial<OperationField>>({
