@@ -487,7 +487,6 @@ export default function AgroOperations() {
                     </Card>
                   </TabsContent>
                 </Tabs>
-                )}
               </div>
 
               <DialogFooter>
