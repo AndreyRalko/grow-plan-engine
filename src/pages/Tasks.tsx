@@ -574,7 +574,10 @@ export default function Tasks() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <CardTitle className="text-xl">{task.title}</CardTitle>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      {task.type === "Транспортировка" && <Truck className="h-4 w-4 text-primary" />}
+                      {task.title}
+                    </CardTitle>
                     <CardDescription className="flex items-center space-x-4 text-sm">
                       <span className="text-muted-foreground">{task.type}</span>
                       <span>•</span>
@@ -586,7 +589,25 @@ export default function Tasks() {
                   {getStatusBadge(task.status)}
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {task.type === "Транспортировка" && task.transportFrom && task.transportTo && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+                      <span className="font-medium">А:</span>
+                      <span className="text-muted-foreground">{task.transportFrom.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-3.5 w-3.5 text-red-600" />
+                      <span className="font-medium">Б:</span>
+                      <span className="text-muted-foreground">{task.transportTo.name}</span>
+                    </div>
+                    {task.transportDescription && (
+                      <p className="text-xs text-muted-foreground italic">{task.transportDescription}</p>
+                    )}
+                    <TransportMap from={task.transportFrom} to={task.transportTo} />
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
                     Исполнитель: <span className="text-foreground font-medium">{task.assignee}</span>
