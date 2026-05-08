@@ -735,7 +735,10 @@ export default function AgroOperations() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg">{operation.name}</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {operation.operationType === "transport" && <Truck className="h-4 w-4 text-primary" />}
+                        {operation.name}
+                      </CardTitle>
                       <CardDescription>{operation.description}</CardDescription>
                     </div>
                     <div className="flex gap-1">
