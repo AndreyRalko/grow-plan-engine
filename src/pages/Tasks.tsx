@@ -205,8 +205,86 @@ export default function Tasks() {
                   </Select>
                 </div>
 
+                {isTransport && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Описание маршрута</Label>
+                      <Textarea
+                        placeholder="Что и зачем перевозится..."
+                        value={transportDescription}
+                        onChange={(e) => setTransportDescription(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Card className="border-emerald-500/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-emerald-600" />
+                            Точка А (отправление)
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <Input
+                            placeholder="Название (напр. Поле №1)"
+                            value={transportFrom.name}
+                            onChange={(e) => setTransportFrom({ ...transportFrom, name: e.target.value })}
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Широта"
+                              value={transportFrom.lat || ""}
+                              onChange={(e) => setTransportFrom({ ...transportFrom, lat: parseFloat(e.target.value) || 0 })}
+                            />
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Долгота"
+                              value={transportFrom.lng || ""}
+                              onChange={(e) => setTransportFrom({ ...transportFrom, lng: parseFloat(e.target.value) || 0 })}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="border-red-500/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-red-600" />
+                            Точка Б (назначение)
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <Input
+                            placeholder="Название (напр. Элеватор)"
+                            value={transportTo.name}
+                            onChange={(e) => setTransportTo({ ...transportTo, name: e.target.value })}
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Широта"
+                              value={transportTo.lat || ""}
+                              onChange={(e) => setTransportTo({ ...transportTo, lat: parseFloat(e.target.value) || 0 })}
+                            />
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Долгота"
+                              value={transportTo.lng || ""}
+                              onChange={(e) => setTransportTo({ ...transportTo, lng: parseFloat(e.target.value) || 0 })}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    <TransportMap from={transportFrom} to={transportTo} />
+                  </div>
+                )}
+
+                {!isTransport && (
                 <div className="space-y-2">
-                  <Label htmlFor="crop">Культура</Label>
                   <Select onValueChange={setSelectedCrop}>
                     <SelectTrigger id="crop">
                       <SelectValue placeholder="Выберите культуру" />
