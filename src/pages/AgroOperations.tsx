@@ -305,16 +305,6 @@ export default function AgroOperations() {
                   </div>
                 </div>
 
-                {(
-
-                {currentOperation.operationType === "transport" ? (
-                  <TransportEditor
-                    operation={currentOperation}
-                    onChange={(updates) =>
-                      setCurrentOperation({ ...currentOperation, ...updates } as any)
-                    }
-                  />
-                ) : (
                 <Tabs defaultValue="start_condition" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="start_condition" className="flex items-center gap-2">
