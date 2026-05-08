@@ -90,6 +90,7 @@ const integrations: Integration[] = [
 const allSensors = integrations.flatMap(i => i.fields);
 
 type FieldType = "start_condition" | "execution";
+type OperationType = "standard" | "transport";
 
 interface OperationField {
   id: string;
@@ -98,11 +99,21 @@ interface OperationField {
   type: FieldType;
 }
 
+interface TransportPoint {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
 interface AgroOperation {
   id: string;
   name: string;
   description: string;
   fields: OperationField[];
+  operationType: OperationType;
+  transportFrom?: TransportPoint;
+  transportTo?: TransportPoint;
+  transportDescription?: string;
 }
 
 // Примеры операций
@@ -111,6 +122,7 @@ const initialOperations: AgroOperation[] = [
     id: "1",
     name: "Посев",
     description: "Посев сельскохозяйственных культур",
+    operationType: "standard",
     fields: [
       { id: "1", name: "Температура почвы", sensorId: "temp_soil", type: "start_condition" },
       { id: "2", name: "Влажность почвы", sensorId: "humidity_soil", type: "start_condition" },
@@ -123,6 +135,7 @@ const initialOperations: AgroOperation[] = [
     id: "2",
     name: "Опрыскивание",
     description: "Обработка культур средствами защиты",
+    operationType: "standard",
     fields: [
       { id: "1", name: "Скорость ветра", sensorId: "wind_speed", type: "start_condition" },
       { id: "2", name: "Температура воздуха", sensorId: "temp_air", type: "start_condition" },
@@ -130,6 +143,16 @@ const initialOperations: AgroOperation[] = [
       { id: "4", name: "Норма расхода", sensorId: null, type: "execution" },
       { id: "5", name: "Высота штанги", sensorId: null, type: "execution" },
     ]
+  },
+  {
+    id: "3",
+    name: "Транспортировка зерна",
+    description: "Перевозка урожая с поля на элеватор",
+    operationType: "transport",
+    fields: [],
+    transportFrom: { name: "Поле №1", lat: 55.7558, lng: 37.6173 },
+    transportTo: { name: "Элеватор", lat: 55.8000, lng: 37.7000 },
+    transportDescription: "Перевозка пшеницы с поля №1 на центральный элеватор"
   },
 ];
 
