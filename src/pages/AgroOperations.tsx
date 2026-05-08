@@ -227,7 +227,7 @@ export default function AgroOperations() {
         id: Date.now().toString()
       };
       setOperations([...operations, operation]);
-      setNewOperation({ id: "", name: "", description: "", fields: [] });
+      setNewOperation({ id: "", name: "", description: "", fields: [], operationType: "standard" });
     }
     setIsDialogOpen(false);
   };
@@ -293,7 +293,7 @@ export default function AgroOperations() {
             setIsDialogOpen(open);
             if (!open) {
               setEditingOperation(null);
-              setNewOperation({ id: "", name: "", description: "", fields: [] });
+              setNewOperation({ id: "", name: "", description: "", fields: [], operationType: "standard" });
             }
           }}>
             <DialogTrigger asChild>
