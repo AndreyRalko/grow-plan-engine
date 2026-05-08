@@ -33,8 +33,12 @@ import {
   Gauge,
   Ruler,
   Timer,
-  Eye
+  Eye,
+  Truck,
+  MapPin,
+  Route
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 // Интеграции и их поля (датчики)
 interface IntegrationField {
