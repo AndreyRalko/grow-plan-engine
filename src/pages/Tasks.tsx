@@ -2,7 +2,8 @@ import { useState } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, CheckCircle2, Clock, AlertCircle, CalendarIcon } from "lucide-react";
+import { Plus, CheckCircle2, Clock, AlertCircle, CalendarIcon, Truck, MapPin } from "lucide-react";
+import { TransportMap, type TransportPoint } from "@/components/TransportMap";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ const taskTypes = [
   "Заготовка",
   "Хранение",
   "Корм скота",
+  "Транспортировка",
 ];
 
 const crops = [
@@ -147,6 +149,11 @@ export default function Tasks() {
   const [selectedField, setSelectedField] = useState<string>("");
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [transportFrom, setTransportFrom] = useState<TransportPoint>({ name: "", lat: 0, lng: 0 });
+  const [transportTo, setTransportTo] = useState<TransportPoint>({ name: "", lat: 0, lng: 0 });
+  const [transportDescription, setTransportDescription] = useState("");
+
+  const isTransport = selectedTaskType === "Транспортировка";
 
   const currentField = fieldsData.find(f => f.id === selectedField);
   const currentCrop = crops.find(c => c.id === selectedCrop);
