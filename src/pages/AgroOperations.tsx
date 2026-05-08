@@ -333,7 +333,38 @@ export default function AgroOperations() {
                   </div>
                 </div>
 
-                {/* Поля операции */}
+                {/* Тип операции */}
+                <div className="space-y-2">
+                  <Label>Тип задания</Label>
+                  <Select
+                    value={currentOperation.operationType}
+                    onValueChange={(value: OperationType) =>
+                      setCurrentOperation({ ...currentOperation, operationType: value } as any)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Стандартная операция</SelectItem>
+                      <SelectItem value="transport">
+                        <div className="flex items-center gap-2">
+                          <Truck className="h-4 w-4" />
+                          Транспортировка
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {currentOperation.operationType === "transport" ? (
+                  <TransportEditor
+                    operation={currentOperation}
+                    onChange={(updates) =>
+                      setCurrentOperation({ ...currentOperation, ...updates } as any)
+                    }
+                  />
+                ) : (
                 <Tabs defaultValue="start_condition" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="start_condition" className="flex items-center gap-2">
