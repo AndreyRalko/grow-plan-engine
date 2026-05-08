@@ -512,8 +512,7 @@ export default function AgroOperations() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        {operation.operationType === "transport" && <Truck className="h-4 w-4 text-primary" />}
+                      <CardTitle className="text-lg">
                         {operation.name}
                       </CardTitle>
                       <CardDescription>{operation.description}</CardDescription>
@@ -529,26 +528,6 @@ export default function AgroOperations() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {operation.operationType === "transport" && (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-3.5 w-3.5 text-emerald-600" />
-                        <span className="font-medium">А:</span>
-                        <span className="text-muted-foreground">{operation.transportFrom?.name || "—"}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-3.5 w-3.5 text-red-600" />
-                        <span className="font-medium">Б:</span>
-                        <span className="text-muted-foreground">{operation.transportTo?.name || "—"}</span>
-                      </div>
-                      {operation.transportDescription && (
-                        <p className="text-xs text-muted-foreground italic pt-1">{operation.transportDescription}</p>
-                      )}
-                      {operation.transportFrom && operation.transportTo && (
-                        <TransportMap from={operation.transportFrom} to={operation.transportTo} />
-                      )}
-                    </div>
-                  )}
                   {/* Условия старта */}
                   {startConditions.length > 0 && (
                     <div>
@@ -602,7 +581,6 @@ export default function AgroOperations() {
                   )}
 
                   <Button variant="outline" className="w-full mt-2" onClick={() => handleEditOperation(operation)}>
-                    <Eye className="mr-2 h-4 w-4" />
                     Подробнее
                   </Button>
                 </CardContent>
