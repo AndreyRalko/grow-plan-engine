@@ -315,6 +315,7 @@ export default function Tasks() {
                     </SelectContent>
                   </Select>
                 </div>
+                )}
 
                 {selectedCrop && optimal && (
                   <div className="space-y-2">
