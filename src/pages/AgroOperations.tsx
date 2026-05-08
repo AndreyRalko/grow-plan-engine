@@ -138,7 +138,6 @@ export default function AgroOperations() {
     name: "",
     description: "",
     fields: [],
-    operationType: "standard"
   });
 
   const [newField, setNewField] = useState<Partial<OperationField>>({
@@ -201,7 +200,7 @@ export default function AgroOperations() {
         id: Date.now().toString()
       };
       setOperations([...operations, operation]);
-      setNewOperation({ id: "", name: "", description: "", fields: [], operationType: "standard" });
+      setNewOperation({ id: "", name: "", description: "", fields: [] });
     }
     setIsDialogOpen(false);
   };
