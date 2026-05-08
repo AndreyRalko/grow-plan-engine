@@ -101,7 +101,20 @@ const fieldsData = [
   { id: "field5", name: "Поле №5", currentTemp: 14, currentMoisture: 68, currentPh: 6.9 },
 ];
 
-const tasks = [
+interface TaskItem {
+  id: number;
+  title: string;
+  type: string;
+  assignee: string;
+  status: string;
+  field: string;
+  dueDate: string;
+  transportFrom?: TransportPoint;
+  transportTo?: TransportPoint;
+  transportDescription?: string;
+}
+
+const tasks: TaskItem[] = [
   {
     id: 1,
     title: "Предпосевная обработка поля №3",
@@ -128,6 +141,18 @@ const tasks = [
     status: "completed",
     field: "Поле №2",
     dueDate: "2025-11-12",
+  },
+  {
+    id: 4,
+    title: "Транспортировка зерна на элеватор",
+    type: "Транспортировка",
+    assignee: "Кузнецов К.К.",
+    status: "pending",
+    field: "Маршрут",
+    dueDate: "2025-11-20",
+    transportFrom: { name: "Поле №1", lat: 55.7558, lng: 37.6173 },
+    transportTo: { name: "Элеватор", lat: 55.8000, lng: 37.7000 },
+    transportDescription: "Перевозка пшеницы с поля №1 на центральный элеватор",
   },
 ];
 
