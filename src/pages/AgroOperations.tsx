@@ -266,7 +266,7 @@ export default function AgroOperations() {
             setIsDialogOpen(open);
             if (!open) {
               setEditingOperation(null);
-              setNewOperation({ id: "", name: "", description: "", fields: [], operationType: "standard" });
+              setNewOperation({ id: "", name: "", description: "", fields: [] });
             }
           }}>
             <DialogTrigger asChild>
@@ -305,29 +305,7 @@ export default function AgroOperations() {
                   </div>
                 </div>
 
-                {/* Тип операции */}
-                <div className="space-y-2">
-                  <Label>Тип задания</Label>
-                  <Select
-                    value={currentOperation.operationType}
-                    onValueChange={(value: OperationType) =>
-                      setCurrentOperation({ ...currentOperation, operationType: value } as any)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Стандартная операция</SelectItem>
-                      <SelectItem value="transport">
-                        <div className="flex items-center gap-2">
-                          <Truck className="h-4 w-4" />
-                          Транспортировка
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {(
 
                 {currentOperation.operationType === "transport" ? (
                   <TransportEditor
