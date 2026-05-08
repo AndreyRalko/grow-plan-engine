@@ -33,12 +33,7 @@ import {
   Gauge,
   Ruler,
   Timer,
-  Eye,
-  Truck,
-  MapPin,
-  Route
 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 
 // Интеграции и их поля (датчики)
 interface IntegrationField {
@@ -90,7 +85,6 @@ const integrations: Integration[] = [
 const allSensors = integrations.flatMap(i => i.fields);
 
 type FieldType = "start_condition" | "execution";
-type OperationType = "standard" | "transport";
 
 interface OperationField {
   id: string;
@@ -99,21 +93,11 @@ interface OperationField {
   type: FieldType;
 }
 
-interface TransportPoint {
-  name: string;
-  lat: number;
-  lng: number;
-}
-
 interface AgroOperation {
   id: string;
   name: string;
   description: string;
   fields: OperationField[];
-  operationType: OperationType;
-  transportFrom?: TransportPoint;
-  transportTo?: TransportPoint;
-  transportDescription?: string;
 }
 
 // Примеры операций
@@ -122,7 +106,6 @@ const initialOperations: AgroOperation[] = [
     id: "1",
     name: "Посев",
     description: "Посев сельскохозяйственных культур",
-    operationType: "standard",
     fields: [
       { id: "1", name: "Температура почвы", sensorId: "temp_soil", type: "start_condition" },
       { id: "2", name: "Влажность почвы", sensorId: "humidity_soil", type: "start_condition" },
@@ -135,7 +118,6 @@ const initialOperations: AgroOperation[] = [
     id: "2",
     name: "Опрыскивание",
     description: "Обработка культур средствами защиты",
-    operationType: "standard",
     fields: [
       { id: "1", name: "Скорость ветра", sensorId: "wind_speed", type: "start_condition" },
       { id: "2", name: "Температура воздуха", sensorId: "temp_air", type: "start_condition" },
@@ -144,179 +126,8 @@ const initialOperations: AgroOperation[] = [
       { id: "5", name: "Высота штанги", sensorId: null, type: "execution" },
     ]
   },
-  {
-    id: "3",
-    name: "Транспортировка зерна",
-    description: "Перевозка урожая с поля на элеватор",
-    operationType: "transport",
-    fields: [],
-    transportFrom: { name: "Поле №1", lat: 55.7558, lng: 37.6173 },
-    transportTo: { name: "Элеватор", lat: 55.8000, lng: 37.7000 },
-    transportDescription: "Перевозка пшеницы с поля №1 на центральный элеватор"
-  },
 ];
 
-function TransportEditor({
-  operation,
-  onChange,
-}: {
-  operation: AgroOperation;
-  onChange: (updates: Partial<AgroOperation>) => void;
-}) {
-  const from = operation.transportFrom || { name: "", lat: 0, lng: 0 };
-  const to = operation.transportTo || { name: "", lat: 0, lng: 0 };
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label>Описание маршрута</Label>
-        <Textarea
-          placeholder="Что и зачем перевозится..."
-          value={operation.transportDescription || ""}
-          onChange={(e) => onChange({ transportDescription: e.target.value })}
-        />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="border-emerald-500/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-emerald-600" />
-              Точка А (отправление)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Input
-              placeholder="Название (напр. Поле №1)"
-              value={from.name}
-              onChange={(e) => onChange({ transportFrom: { ...from, name: e.target.value } })}
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                type="number"
-                step="0.0001"
-                placeholder="Широта"
-                value={from.lat || ""}
-                onChange={(e) => onChange({ transportFrom: { ...from, lat: parseFloat(e.target.value) || 0 } })}
-              />
-              <Input
-                type="number"
-                step="0.0001"
-                placeholder="Долгота"
-                value={from.lng || ""}
-                onChange={(e) => onChange({ transportFrom: { ...from, lng: parseFloat(e.target.value) || 0 } })}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-500/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-red-600" />
-              Точка Б (назначение)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Input
-              placeholder="Название (напр. Элеватор)"
-              value={to.name}
-              onChange={(e) => onChange({ transportTo: { ...to, name: e.target.value } })}
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <Input
-                type="number"
-                step="0.0001"
-                placeholder="Широта"
-                value={to.lat || ""}
-                onChange={(e) => onChange({ transportTo: { ...to, lat: parseFloat(e.target.value) || 0 } })}
-              />
-              <Input
-                type="number"
-                step="0.0001"
-                placeholder="Долгота"
-                value={to.lng || ""}
-                onChange={(e) => onChange({ transportTo: { ...to, lng: parseFloat(e.target.value) || 0 } })}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <TransportMap from={from} to={to} />
-    </div>
-  );
-}
-
-function TransportMap({ from, to }: { from: TransportPoint; to: TransportPoint }) {
-  const hasCoords = from.lat && from.lng && to.lat && to.lng;
-  // Normalize to viewbox 0-400 x 0-200
-  const project = (lat: number, lng: number) => {
-    const lats = [from.lat, to.lat];
-    const lngs = [from.lng, to.lng];
-    const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-    const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-    const padX = 60, padY = 40;
-    const w = 400 - padX * 2, h = 200 - padY * 2;
-    const dLat = maxLat - minLat || 1;
-    const dLng = maxLng - minLng || 1;
-    const x = padX + ((lng - minLng) / dLng) * w;
-    const y = padY + (1 - (lat - minLat) / dLat) * h;
-    return { x, y };
-  };
-
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Route className="h-4 w-4 text-primary" />
-          Маршрут на карте
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="relative w-full h-[220px] bg-gradient-to-br from-secondary via-primary/5 to-accent/5 rounded-lg overflow-hidden border">
-          {hasCoords ? (
-            <svg viewBox="0 0 400 200" className="w-full h-full">
-              {/* Grid */}
-              <defs>
-                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="400" height="200" fill="url(#grid)" />
-              {(() => {
-                const a = project(from.lat, from.lng);
-                const b = project(to.lat, to.lng);
-                return (
-                  <>
-                    <line
-                      x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                      stroke="hsl(var(--primary))"
-                      strokeWidth="2.5"
-                      strokeDasharray="6 4"
-                    />
-                    <circle cx={a.x} cy={a.y} r="8" fill="hsl(142 76% 36%)" stroke="white" strokeWidth="2" />
-                    <text x={a.x} y={a.y - 12} textAnchor="middle" className="fill-foreground text-[10px] font-medium">
-                      А: {from.name || "Начало"}
-                    </text>
-                    <circle cx={b.x} cy={b.y} r="8" fill="hsl(0 72% 51%)" stroke="white" strokeWidth="2" />
-                    <text x={b.x} y={b.y - 12} textAnchor="middle" className="fill-foreground text-[10px] font-medium">
-                      Б: {to.name || "Конец"}
-                    </text>
-                  </>
-                );
-              })()}
-            </svg>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground">
-              Введите координаты обеих точек, чтобы увидеть маршрут
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
 
 export default function AgroOperations() {
   const [operations, setOperations] = useState<AgroOperation[]>(initialOperations);
@@ -327,7 +138,6 @@ export default function AgroOperations() {
     name: "",
     description: "",
     fields: [],
-    operationType: "standard"
   });
 
   const [newField, setNewField] = useState<Partial<OperationField>>({
@@ -390,7 +200,7 @@ export default function AgroOperations() {
         id: Date.now().toString()
       };
       setOperations([...operations, operation]);
-      setNewOperation({ id: "", name: "", description: "", fields: [], operationType: "standard" });
+      setNewOperation({ id: "", name: "", description: "", fields: [] });
     }
     setIsDialogOpen(false);
   };
@@ -456,7 +266,7 @@ export default function AgroOperations() {
             setIsDialogOpen(open);
             if (!open) {
               setEditingOperation(null);
-              setNewOperation({ id: "", name: "", description: "", fields: [], operationType: "standard" });
+              setNewOperation({ id: "", name: "", description: "", fields: [] });
             }
           }}>
             <DialogTrigger asChild>
@@ -495,38 +305,6 @@ export default function AgroOperations() {
                   </div>
                 </div>
 
-                {/* Тип операции */}
-                <div className="space-y-2">
-                  <Label>Тип задания</Label>
-                  <Select
-                    value={currentOperation.operationType}
-                    onValueChange={(value: OperationType) =>
-                      setCurrentOperation({ ...currentOperation, operationType: value } as any)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Стандартная операция</SelectItem>
-                      <SelectItem value="transport">
-                        <div className="flex items-center gap-2">
-                          <Truck className="h-4 w-4" />
-                          Транспортировка
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {currentOperation.operationType === "transport" ? (
-                  <TransportEditor
-                    operation={currentOperation}
-                    onChange={(updates) =>
-                      setCurrentOperation({ ...currentOperation, ...updates } as any)
-                    }
-                  />
-                ) : (
                 <Tabs defaultValue="start_condition" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="start_condition" className="flex items-center gap-2">
@@ -709,7 +487,6 @@ export default function AgroOperations() {
                     </Card>
                   </TabsContent>
                 </Tabs>
-                )}
               </div>
 
               <DialogFooter>
@@ -735,8 +512,7 @@ export default function AgroOperations() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        {operation.operationType === "transport" && <Truck className="h-4 w-4 text-primary" />}
+                      <CardTitle className="text-lg">
                         {operation.name}
                       </CardTitle>
                       <CardDescription>{operation.description}</CardDescription>
@@ -752,26 +528,6 @@ export default function AgroOperations() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {operation.operationType === "transport" && (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-3.5 w-3.5 text-emerald-600" />
-                        <span className="font-medium">А:</span>
-                        <span className="text-muted-foreground">{operation.transportFrom?.name || "—"}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-3.5 w-3.5 text-red-600" />
-                        <span className="font-medium">Б:</span>
-                        <span className="text-muted-foreground">{operation.transportTo?.name || "—"}</span>
-                      </div>
-                      {operation.transportDescription && (
-                        <p className="text-xs text-muted-foreground italic pt-1">{operation.transportDescription}</p>
-                      )}
-                      {operation.transportFrom && operation.transportTo && (
-                        <TransportMap from={operation.transportFrom} to={operation.transportTo} />
-                      )}
-                    </div>
-                  )}
                   {/* Условия старта */}
                   {startConditions.length > 0 && (
                     <div>
@@ -825,7 +581,6 @@ export default function AgroOperations() {
                   )}
 
                   <Button variant="outline" className="w-full mt-2" onClick={() => handleEditOperation(operation)}>
-                    <Eye className="mr-2 h-4 w-4" />
                     Подробнее
                   </Button>
                 </CardContent>

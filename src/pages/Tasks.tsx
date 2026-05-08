@@ -2,12 +2,14 @@ import { useState } from "react";
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, CheckCircle2, Clock, AlertCircle, CalendarIcon } from "lucide-react";
+import { Plus, CheckCircle2, Clock, AlertCircle, CalendarIcon, Truck, MapPin } from "lucide-react";
+import { TransportMap, type TransportPoint } from "@/components/TransportMap";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,7 @@ const taskTypes = [
   "Заготовка",
   "Хранение",
   "Корм скота",
+  "Транспортировка",
 ];
 
 const crops = [
@@ -98,7 +101,20 @@ const fieldsData = [
   { id: "field5", name: "Поле №5", currentTemp: 14, currentMoisture: 68, currentPh: 6.9 },
 ];
 
-const tasks = [
+interface TaskItem {
+  id: number;
+  title: string;
+  type: string;
+  assignee: string;
+  status: string;
+  field: string;
+  dueDate: string;
+  transportFrom?: TransportPoint;
+  transportTo?: TransportPoint;
+  transportDescription?: string;
+}
+
+const tasks: TaskItem[] = [
   {
     id: 1,
     title: "Предпосевная обработка поля №3",
@@ -126,6 +142,18 @@ const tasks = [
     field: "Поле №2",
     dueDate: "2025-11-12",
   },
+  {
+    id: 4,
+    title: "Транспортировка зерна на элеватор",
+    type: "Транспортировка",
+    assignee: "Кузнецов К.К.",
+    status: "pending",
+    field: "Маршрут",
+    dueDate: "2025-11-20",
+    transportFrom: { name: "Поле №1", lat: 55.7558, lng: 37.6173 },
+    transportTo: { name: "Элеватор", lat: 55.8000, lng: 37.7000 },
+    transportDescription: "Перевозка пшеницы с поля №1 на центральный элеватор",
+  },
 ];
 
 const getStatusBadge = (status: string) => {
@@ -147,6 +175,11 @@ export default function Tasks() {
   const [selectedField, setSelectedField] = useState<string>("");
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [transportFrom, setTransportFrom] = useState<TransportPoint>({ name: "", lat: 0, lng: 0 });
+  const [transportTo, setTransportTo] = useState<TransportPoint>({ name: "", lat: 0, lng: 0 });
+  const [transportDescription, setTransportDescription] = useState("");
+
+  const isTransport = selectedTaskType === "Транспортировка";
 
   const currentField = fieldsData.find(f => f.id === selectedField);
   const currentCrop = crops.find(c => c.id === selectedCrop);
@@ -198,6 +231,86 @@ export default function Tasks() {
                   </Select>
                 </div>
 
+                {isTransport && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Описание маршрута</Label>
+                      <Textarea
+                        placeholder="Что и зачем перевозится..."
+                        value={transportDescription}
+                        onChange={(e) => setTransportDescription(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <Card className="border-emerald-500/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-emerald-600" />
+                            Точка А (отправление)
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <Input
+                            placeholder="Название (напр. Поле №1)"
+                            value={transportFrom.name}
+                            onChange={(e) => setTransportFrom({ ...transportFrom, name: e.target.value })}
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Широта"
+                              value={transportFrom.lat || ""}
+                              onChange={(e) => setTransportFrom({ ...transportFrom, lat: parseFloat(e.target.value) || 0 })}
+                            />
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Долгота"
+                              value={transportFrom.lng || ""}
+                              onChange={(e) => setTransportFrom({ ...transportFrom, lng: parseFloat(e.target.value) || 0 })}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="border-red-500/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-red-600" />
+                            Точка Б (назначение)
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <Input
+                            placeholder="Название (напр. Элеватор)"
+                            value={transportTo.name}
+                            onChange={(e) => setTransportTo({ ...transportTo, name: e.target.value })}
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Широта"
+                              value={transportTo.lat || ""}
+                              onChange={(e) => setTransportTo({ ...transportTo, lat: parseFloat(e.target.value) || 0 })}
+                            />
+                            <Input
+                              type="number"
+                              step="0.0001"
+                              placeholder="Долгота"
+                              value={transportTo.lng || ""}
+                              onChange={(e) => setTransportTo({ ...transportTo, lng: parseFloat(e.target.value) || 0 })}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    <TransportMap from={transportFrom} to={transportTo} />
+                  </div>
+                )}
+
+                {!isTransport && (
+                <>
                 <div className="space-y-2">
                   <Label htmlFor="crop">Культура</Label>
                   <Select onValueChange={setSelectedCrop}>
@@ -229,6 +342,8 @@ export default function Tasks() {
                     </SelectContent>
                   </Select>
                 </div>
+                </>
+                )}
 
                 {selectedCrop && optimal && (
                   <div className="space-y-2">
@@ -459,7 +574,10 @@ export default function Tasks() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <CardTitle className="text-xl">{task.title}</CardTitle>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      {task.type === "Транспортировка" && <Truck className="h-4 w-4 text-primary" />}
+                      {task.title}
+                    </CardTitle>
                     <CardDescription className="flex items-center space-x-4 text-sm">
                       <span className="text-muted-foreground">{task.type}</span>
                       <span>•</span>
@@ -471,7 +589,25 @@ export default function Tasks() {
                   {getStatusBadge(task.status)}
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {task.type === "Транспортировка" && task.transportFrom && task.transportTo && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-3.5 w-3.5 text-emerald-600" />
+                      <span className="font-medium">А:</span>
+                      <span className="text-muted-foreground">{task.transportFrom.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-3.5 w-3.5 text-red-600" />
+                      <span className="font-medium">Б:</span>
+                      <span className="text-muted-foreground">{task.transportTo.name}</span>
+                    </div>
+                    {task.transportDescription && (
+                      <p className="text-xs text-muted-foreground italic">{task.transportDescription}</p>
+                    )}
+                    <TransportMap from={task.transportFrom} to={task.transportTo} />
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">
                     Исполнитель: <span className="text-foreground font-medium">{task.assignee}</span>
