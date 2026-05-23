@@ -36,6 +36,7 @@ const App = () => (
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/integrations/weather-sensors" element={<WeatherSensors />} />
           <Route path="/fertilizer" element={<FertilizerCalculator />} />
+          <Route path="/ndvi" element={<NdviMonitoring />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
