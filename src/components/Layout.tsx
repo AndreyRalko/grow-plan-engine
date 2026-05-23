@@ -38,6 +38,7 @@ const navigation = [
   { name: "Техника", href: "/equipment", icon: Tractor },
   { name: "Животные", href: "/livestock", icon: Beef },
   { name: "Удобрения", href: "/fertilizer", icon: FlaskConical },
+  { name: "NDVI-мониторинг", href: "/ndvi", icon: Satellite },
   { name: "Интеграции", href: "/integrations", icon: Cable },
   { name: "Настройки", href: "/settings", icon: Settings },
 ];
