@@ -11,7 +11,8 @@ import {
   Settings,
   Cog,
   Wheat,
-  FlaskConical
+  FlaskConical,
+  Satellite
 } from "lucide-react";
 import {
   Sidebar,
