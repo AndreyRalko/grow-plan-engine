@@ -17,7 +17,7 @@ import {
 import {
   Satellite, Plane, Upload, MapPin, AlertTriangle, TrendingDown, TrendingUp,
   Sparkles, Leaf, Droplets, Activity, CheckCircle2, ChevronRight, FileImage,
-  Calendar, Layers, Map as MapIcon, Cog, FileUp, Brain, Target
+  Calendar, Layers, Map as MapIcon, Cog, FileUp, Brain, Target, Eye
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -230,6 +230,19 @@ const initialRecommendations: AiRecommendation[] = [
     priority: "Низкий",
     date: "2026-05-22",
   },
+];
+
+// Доступные типы агрооперций из модуля «Агро-операции»
+const agroOperationTypes = [
+  "Посев",
+  "Опрыскивание",
+  "Полив",
+  "Внесение удобрений",
+  "Культивация",
+  "Боронование",
+  "Уборка урожая",
+  "Агрохимический анализ почвы",
+  "Обследование поля",
 ];
 
 const dateRange = ["01.04", "15.04", "01.05", "15.05", "22.05"];
