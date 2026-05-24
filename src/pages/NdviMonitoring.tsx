@@ -403,10 +403,26 @@ export default function NdviMonitoring() {
   ]);
   const [compareMode, setCompareMode] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(true);
+  const [detailDialog, setDetailDialog] = useState<AiRecommendation | null>(null);
   const [acceptDialog, setAcceptDialog] = useState<AiRecommendation | null>(null);
+  const [selectedOpType, setSelectedOpType] = useState<string>("");
+  const [opComment, setOpComment] = useState("");
   const [assignTo, setAssignTo] = useState("Иванов И.И.");
   const [deadline, setDeadline] = useState("2026-05-29");
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const openAcceptFromDetail = (r: AiRecommendation) => {
+    setSelectedOpType(r.operation);
+    setOpComment(r.reason);
+    setDetailDialog(null);
+    setAcceptDialog(r);
+  };
+
+  const openDetail = (r: AiRecommendation) => {
+    setSelectedOpType(r.operation);
+    setOpComment(r.reason);
+    setDetailDialog(r);
+  };
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) || fields[0];
   const avgNdvi = (fields.reduce((s, f) => s + f.avgNdvi, 0) / fields.length).toFixed(2);
@@ -443,9 +459,13 @@ export default function NdviMonitoring() {
 
   const acceptRecommendation = () => {
     if (!acceptDialog) return;
+    if (!selectedOpType) {
+      toast.error("Выберите тип агрооперации");
+      return;
+    }
     setRecommendations((p) => p.map((r) => r.id === acceptDialog.id ? { ...r, accepted: true } : r));
     toast.success("Агрооперация создана", {
-      description: `${acceptDialog.operation} → ${acceptDialog.fieldName}. Ответственный: ${assignTo}, срок: ${deadline}`,
+      description: `${selectedOpType} → ${acceptDialog.fieldName}. Ответственный: ${assignTo}, срок: ${deadline}`,
     });
     setAcceptDialog(null);
   };
