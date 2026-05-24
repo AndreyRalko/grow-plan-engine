@@ -713,7 +713,12 @@ export default function NdviMonitoring() {
                         {r.accepted ? (
                           <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" /> Принято</Badge>
                         ) : (
-                          <Button size="sm" variant="outline" onClick={() => setAcceptDialog(r)}>Принять → Агрооперация</Button>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="ghost" onClick={() => openDetail(r)}>
+                              <Eye className="h-3 w-3" />
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => { setSelectedOpType(r.operation); setOpComment(r.reason); setAcceptDialog(r); }}>Принять → Агрооперация</Button>
+                          </div>
                         )}
                       </div>
                     </div>
