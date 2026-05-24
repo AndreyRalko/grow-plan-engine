@@ -815,11 +815,16 @@ export default function NdviMonitoring() {
                         <TableCell>{r.priority}</TableCell>
                         <TableCell className="text-xs">{r.date}</TableCell>
                         <TableCell>
-                          {r.accepted ? (
-                            <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" /> Принято</Badge>
-                          ) : (
-                            <Button size="sm" onClick={() => setAcceptDialog(r)}>Принять</Button>
-                          )}
+                          <div className="flex gap-2 justify-end">
+                            <Button size="sm" variant="outline" onClick={() => openDetail(r)}>
+                              <Eye className="h-3 w-3 mr-1" /> Подробнее
+                            </Button>
+                            {r.accepted ? (
+                              <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" /> Принято</Badge>
+                            ) : (
+                              <Button size="sm" onClick={() => { setSelectedOpType(r.operation); setOpComment(r.reason); setAcceptDialog(r); }}>Принять</Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -830,7 +835,7 @@ export default function NdviMonitoring() {
           </TabsContent>
         </Tabs>
 
-        {/* Диалог принятия рекомендации */}
+        {/* Диалог принятия рекомендации — выбор агрооперации */}
         <Dialog open={!!acceptDialog} onOpenChange={(o) => !o && setAcceptDialog(null)}>
           <DialogContent>
             <DialogHeader>
@@ -840,8 +845,19 @@ export default function NdviMonitoring() {
             {acceptDialog && (
               <div className="space-y-3">
                 <div className="bg-muted/50 rounded-lg p-3 text-sm">
-                  <div className="font-medium">{acceptDialog.operation}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{acceptDialog.fieldName} · {acceptDialog.reason}</div>
+                  <div className="font-medium">{acceptDialog.fieldName}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{acceptDialog.reason}</div>
+                </div>
+                <div>
+                  <Label>Тип агрооперации</Label>
+                  <Select value={selectedOpType} onValueChange={setSelectedOpType}>
+                    <SelectTrigger><SelectValue placeholder="Выберите операцию" /></SelectTrigger>
+                    <SelectContent>
+                      {agroOperationTypes.map((op) => (
+                        <SelectItem key={op} value={op}>{op}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label>Ответственный</Label>
@@ -853,13 +869,81 @@ export default function NdviMonitoring() {
                 </div>
                 <div>
                   <Label>Комментарий</Label>
-                  <Textarea placeholder="Дополнительные указания..." />
+                  <Textarea
+                    placeholder="Дополнительные указания..."
+                    value={opComment}
+                    onChange={(e) => setOpComment(e.target.value)}
+                  />
                 </div>
               </div>
             )}
             <DialogFooter>
               <Button variant="outline" onClick={() => setAcceptDialog(null)}>Отмена</Button>
               <Button onClick={acceptRecommendation}>Создать агрооперацию</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Диалог просмотра подробностей рекомендации */}
+        <Dialog open={!!detailDialog} onOpenChange={(o) => !o && setDetailDialog(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" /> AI-рекомендация
+              </DialogTitle>
+              <DialogDescription>Детали и переход к созданию агрооперации</DialogDescription>
+            </DialogHeader>
+            {detailDialog && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="border border-border rounded-lg p-3">
+                    <div className="text-xs text-muted-foreground">Поле</div>
+                    <div className="font-medium">{detailDialog.fieldName}</div>
+                  </div>
+                  <div className="border border-border rounded-lg p-3">
+                    <div className="text-xs text-muted-foreground">Дата</div>
+                    <div className="font-medium">{detailDialog.date}</div>
+                  </div>
+                  <div className="border border-border rounded-lg p-3">
+                    <div className="text-xs text-muted-foreground">Уровень риска</div>
+                    <Badge variant={riskVariant(detailDialog.risk)} className="mt-1">{riskLabel(detailDialog.risk)}</Badge>
+                  </div>
+                  <div className="border border-border rounded-lg p-3">
+                    <div className="text-xs text-muted-foreground">Приоритет</div>
+                    <div className="font-medium">{detailDialog.priority}</div>
+                  </div>
+                </div>
+                <div className="border border-border rounded-lg p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Рекомендуемая операция (AI)</div>
+                  <div className="font-medium">{detailDialog.operation}</div>
+                </div>
+                <div className="border border-border rounded-lg p-3">
+                  <div className="text-xs text-muted-foreground mb-1">Обоснование</div>
+                  <div className="text-sm">{detailDialog.reason}</div>
+                </div>
+                <div>
+                  <Label>Выберите тип агрооперации</Label>
+                  <Select value={selectedOpType} onValueChange={setSelectedOpType}>
+                    <SelectTrigger><SelectValue placeholder="Выберите операцию из модуля «Агро-операции»" /></SelectTrigger>
+                    <SelectContent>
+                      {agroOperationTypes.map((op) => (
+                        <SelectItem key={op} value={op}>{op}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Типы операций берутся из модуля «Агро-операции»
+                  </p>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDetailDialog(null)}>Закрыть</Button>
+              {detailDialog && !detailDialog.accepted && (
+                <Button onClick={() => openAcceptFromDetail(detailDialog)}>
+                  <Cog className="h-4 w-4 mr-2" /> Создать агрооперацию
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
