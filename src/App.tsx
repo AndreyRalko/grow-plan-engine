@@ -39,7 +39,7 @@ const App = () => (
           <Route path="/fertilizer" element={<FertilizerCalculator />} />
           <Route path="/ndvi" element={<NdviMonitoring />} />
           <Route path="/storage" element={<Storage />} />
-          <Route path="/settings" element={<Settings />} />pat
+          <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
