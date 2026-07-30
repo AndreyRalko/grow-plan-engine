@@ -15,6 +15,7 @@ import WeatherSensors from "./pages/WeatherSensors";
 import Settings from "./pages/Settings";
 import FertilizerCalculator from "./pages/FertilizerCalculator";
 import NdviMonitoring from "./pages/NdviMonitoring";
+import Storage from "./pages/Storage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
