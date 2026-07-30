@@ -12,7 +12,8 @@ import {
   Cog,
   Wheat,
   FlaskConical,
-  Satellite
+  Satellite,
+  Warehouse
 } from "lucide-react";
 import {
   Sidebar,
@@ -39,6 +40,7 @@ const navigation = [
   { name: "Животные", href: "/livestock", icon: Beef },
   { name: "Удобрения", href: "/fertilizer", icon: FlaskConical },
   { name: "NDVI-мониторинг", href: "/ndvi", icon: Satellite },
+  { name: "Хранение", href: "/storage", icon: Warehouse },
   { name: "Интеграции", href: "/integrations", icon: Cable },
   { name: "Настройки", href: "/settings", icon: Settings },
 ];

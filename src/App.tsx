@@ -15,6 +15,7 @@ import WeatherSensors from "./pages/WeatherSensors";
 import Settings from "./pages/Settings";
 import FertilizerCalculator from "./pages/FertilizerCalculator";
 import NdviMonitoring from "./pages/NdviMonitoring";
+import Storage from "./pages/Storage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/integrations/weather-sensors" element={<WeatherSensors />} />
           <Route path="/fertilizer" element={<FertilizerCalculator />} />
           <Route path="/ndvi" element={<NdviMonitoring />} />
+          <Route path="/storage" element={<Storage />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
